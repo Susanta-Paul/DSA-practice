@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ultimate DSA Sheet</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#f6f7f9;--card:#fff;--tx:#1b1f24;--mu:#667085;--bd:#e3e6eb;--ac:#4f46e5;--e:#12a150;--m:#c47f00;--h:#dc3545}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1115;--card:#171a21;--tx:#e8eaed;--mu:#98a2b3;--bd:#2a2f3a;--ac:#8b85ff;--e:#3ecf82;--m:#f0b429;--h:#ff6b78}}
+:root[data-theme="dark"]{--bg:#0f1115;--card:#171a21;--tx:#e8eaed;--mu:#98a2b3;--bd:#2a2f3a;--ac:#8b85ff;--e:#3ecf82;--m:#f0b429;--h:#ff6b78}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:920px;margin:0 auto;padding:20px 14px 60px}
+header{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+h1{margin:0;font-size:1.6rem}
+.sub{color:var(--mu);margin:4px 0 14px}
+button,select,input[type=search]{font:inherit;color:var(--tx);background:var(--card);border:1px solid var(--bd);border-radius:8px;padding:8px 10px}
+button{cursor:pointer}button:hover{border-color:var(--ac)}
+.pri{background:var(--ac);border-color:var(--ac);color:#fff;font-weight:600}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:14px;margin-bottom:12px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-top:10px}
+.stat b{display:block;font-size:1.2rem}.stat span{color:var(--mu);font-size:.8rem}
+.bar{height:8px;background:var(--bd);border-radius:99px;overflow:hidden}.bar i{display:block;height:100%;background:var(--ac);width:0;transition:width .3s}
+.tools{display:flex;flex-wrap:wrap;gap:8px}.tools input{flex:1 1 180px}
+#pick{display:none;border-color:var(--ac)}#pick.on{display:block}
+#pick h2{margin:2px 0 8px;font-size:1.2rem}.acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+a.btn{text-decoration:none;display:inline-block;padding:8px 12px;border-radius:8px}
+.grp{margin:18px 0 6px;font-weight:700;color:var(--mu);font-size:.8rem;text-transform:uppercase;letter-spacing:.05em}
+.row{display:flex;align-items:center;gap:10px;padding:9px 10px;background:var(--card);border:1px solid var(--bd);border-radius:10px;margin-bottom:6px}
+.row.hl{outline:2px solid var(--ac)}
+.row input{width:18px;height:18px;flex:none;accent-color:var(--ac)}
+.row a{flex:1;color:var(--tx);text-decoration:none;font-weight:500;min-width:0}.row a:hover{color:var(--ac);text-decoration:underline}
+.row.done a{color:var(--mu);text-decoration:line-through}
+.row.review{border-left:4px solid var(--m)}
+.chip{font-size:.72rem;color:var(--mu);border:1px solid var(--bd);border-radius:99px;padding:1px 8px;white-space:nowrap}
+.d{font-size:.78rem;font-weight:700;min-width:52px;text-align:right}.d.E{color:var(--e)}.d.M{color:var(--m)}.d.H{color:var(--h)}
+.rv{padding:2px 8px;opacity:.5}.review .rv{opacity:1;color:var(--m)}
+.empty{text-align:center;color:var(--mu);padding:30px}
+@media(max-width:560px){.row{flex-wrap:wrap}.row .chip.t{order:5}.row a{flex-basis:60%}}
+</style>
+</head>
+<body>
+<main>
+<header>
+ <div><h1>Ultimate DSA Sheet</h1><p class="sub">NeetCode 150 + your own sheet, merged. Progress is saved in your browser.</p></div>
+ <div style="display:flex;gap:6px"><button id="theme" title="Toggle theme">◐</button><button id="reset">Reset</button></div>
+</header>
+
+<section class="card">
+ <div class="bar"><i id="bar"></i></div>
+ <div class="stats" id="stats"></div>
+</section>
+
+<section class="card" id="pick"></section>
+
+<section class="card tools">
+ <input type="search" id="q" placeholder="Search problems…">
+ <select id="fd"><option value="">All difficulty</option><option value="E">Easy</option><option value="M">Medium</option><option value="H">Hard</option></select>
+ <select id="fs"><option value="">All status</option><option value="todo">Yet to do</option><option value="done">Done</option><option value="review">Needs review</option></select>
+ <select id="ft"></select>
+ <select id="so"><option value="">Sheet order</option><option value="ea">Easy → Hard</option><option value="he">Hard → Easy</option><option value="az">A → Z</option><option value="td">Yet to do first</option></select>
+ <button class="pri" id="shuf">🎲 Shuffle</button>
+</section>
+
+<div id="list"></div>
+</main>
+
+<script>
+const RAW={
+"Arrays & Hashing":"contains-duplicate:E valid-anagram:E two-sum:E group-anagrams:M top-k-frequent-elements:M:d encode-and-decode-strings:M:p product-of-array-except-self:M:d valid-sudoku:M longest-consecutive-sequence:M",
+"Two Pointers":"valid-palindrome:E two-sum-ii-input-array-is-sorted:M:d 3sum:M:d container-with-most-water:M:d trapping-rain-water:H:d",
+"Sliding Window":"best-time-to-buy-and-sell-stock:E longest-substring-without-repeating-characters:M:d longest-repeating-character-replacement:M:d permutation-in-string:M minimum-window-substring:H sliding-window-maximum:H:d",
+"Stack":"valid-parentheses:E min-stack:M evaluate-reverse-polish-notation:M generate-parentheses:M daily-temperatures:M:d next-greater-element-ii:M:d car-fleet:M largest-rectangle-in-histogram:H:d maximal-rectangle:H",
+"Binary Search":"binary-search:E search-a-2d-matrix:M koko-eating-bananas:M:d find-minimum-in-rotated-sorted-array:M:d search-in-rotated-sorted-array:M:d capacity-to-ship-packages-within-d-days:M:d search-a-2d-matrix-ii:M:d time-based-key-value-store:M median-of-two-sorted-arrays:H",
+"Linked List":"reverse-linked-list:E merge-two-sorted-lists:E linked-list-cycle:E middle-of-the-linked-list:E:d linked-list-cycle-ii:M:d reorder-list:M:d sort-list:M:d reverse-linked-list-ii:M remove-nth-node-from-end-of-list:M copy-list-with-random-pointer:M add-two-numbers:M find-the-duplicate-number:M lru-cache:M reverse-nodes-in-k-group:H merge-k-sorted-lists:H",
+"Trees":"invert-binary-tree:E maximum-depth-of-binary-tree:E diameter-of-binary-tree:E:d balanced-binary-tree:E same-tree:E subtree-of-another-tree:E lowest-common-ancestor-of-a-binary-search-tree:M lowest-common-ancestor-of-a-binary-tree:M:d binary-tree-level-order-traversal:M:d binary-tree-zigzag-level-order-traversal:M:d binary-tree-right-side-view:M:d populating-next-right-pointers-in-each-node:M:d count-good-nodes-in-binary-tree:M validate-binary-search-tree:M kth-smallest-element-in-a-bst:M construct-binary-tree-from-preorder-and-inorder-traversal:M construct-binary-tree-from-inorder-and-postorder-traversal:M:d binary-tree-maximum-path-sum:H:d serialize-and-deserialize-binary-tree:H:d",
+"Tries":"implement-trie-prefix-tree:M:d design-add-and-search-words-data-structure:M:d word-search-ii:H:d design-search-autocomplete-system:H:p",
+"Heap / Priority Queue":"kth-largest-element-in-a-stream:E last-stone-weight:E k-closest-points-to-origin:M:d kth-largest-element-in-an-array:M task-scheduler:M design-twitter:M reorganize-string:M:d minimum-cost-to-connect-sticks:M:p find-median-from-data-stream:H ipo:H",
+"Backtracking":"subsets:M combination-sum:M permutations:M subsets-ii:M:d permutations-ii:M:d combination-sum-ii:M:d word-search:M palindrome-partitioning:M:d letter-combinations-of-a-phone-number:M n-queens:H sudoku-solver:H",
+"Graphs":"number-of-islands:M:d max-area-of-island:M clone-graph:M walls-and-gates:M:p rotting-oranges:M:d 01-matrix:M:d pacific-atlantic-water-flow:M:d surrounded-regions:M course-schedule:M course-schedule-ii:M:d graph-valid-tree:M:p number-of-connected-components-in-an-undirected-graph:M:dp redundant-connection:M:d accounts-merge:M:d word-ladder:H:d",
+"Advanced Graphs":"reconstruct-itinerary:H min-cost-to-connect-all-points:M network-delay-time:M:d cheapest-flights-within-k-stops:M:d swim-in-rising-water:H alien-dictionary:H:p",
+"1-D DP":"climbing-stairs:E min-cost-climbing-stairs:E house-robber:M:d house-robber-ii:M:d longest-palindromic-substring:M palindromic-substrings:M:d decode-ways:M coin-change:M:d maximum-product-subarray:M word-break:M longest-increasing-subsequence:M:d partition-equal-subset-sum:M:d target-sum:M:d",
+"2-D DP":"unique-paths:M longest-common-subsequence:M:d best-time-to-buy-and-sell-stock-with-cooldown:M best-time-to-buy-and-sell-stock-with-transaction-fee:M best-time-to-buy-and-sell-stock-iii:H best-time-to-buy-and-sell-stock-iv:H coin-change-ii:M interleaving-string:M longest-increasing-path-in-a-matrix:H distinct-subsequences:H:d edit-distance:M:d burst-balloons:H:d regular-expression-matching:H:d palindrome-partitioning-ii:H:d strange-printer:H binary-tree-cameras:H shortest-path-visiting-all-nodes:H maximum-students-taking-exam:H",
+"Greedy":"maximum-subarray:M jump-game:M jump-game-ii:M gas-station:M hand-of-straights:M merge-triplets-to-form-target-triplet:M partition-labels:M valid-parenthesis-string:M candy:H",
+"Intervals":"meeting-rooms:E:p meeting-rooms-ii:M:p insert-interval:M:d merge-intervals:M:d non-overlapping-intervals:M:d minimum-interval-to-include-each-query:H",
+"Math & Matrix":"rotate-image:M:d spiral-matrix:M:d set-matrix-zeroes:M happy-number:E plus-one:E powx-n:M multiply-strings:M detect-squares:M",
+"Bit Manipulation":"single-number:E:d number-of-1-bits:E:d counting-bits:E:d reverse-bits:E:r sum-of-two-integers:M reverse-integer:M single-number-iii:M",
+"Prefix Sum & Cyclic Sort":"subarray-sum-equals-k:M:d range-sum-query-2d-immutable:M:d count-of-range-sum:H:x missing-number:E:d find-all-duplicates-in-an-array:M:d first-missing-positive:H",
+"Advanced Structures":"lfu-cache:H range-sum-query-mutable:M count-of-smaller-numbers-after-self:H"
+};
+const W={ii:"II",iii:"III",iv:"IV","2d":"2D","3sum":"3Sum",lru:"LRU",lfu:"LFU",k:"K",bst:"BST",d:"D",ipo:"IPO"};
+const SM=new Set("of to in from with the a an and for on at by".split(" "));
+const O={"powx-n":"Pow(x, n)","implement-trie-prefix-tree":"Implement Trie (Prefix Tree)","n-queens":"N-Queens","sum-of-two-integers":"Sum of Two Integers"};
+const title=s=>s.split("-").map((w,i)=>W[w]||(i&&SM.has(w)?w:w[0].toUpperCase()+w.slice(1))).join(" ");
+const P=[];
+for(const[t,s]of Object.entries(RAW))s.split(" ").forEach(x=>{const[slug,d,f=""]=x.split(":");P.push({slug,d,t,i:P.length,title:O[slug]||title(slug),prem:f.includes("p"),seed:f.includes("d")?"done":(f.includes("r")||f.includes("x"))?"review":""})});
+const DN={E:"Easy",M:"Medium",H:"Hard"},ORD={E:0,M:1,H:2};
+
+const K="dsa-ultimate-v1";let st={};
+const save=()=>{try{localStorage.setItem(K,JSON.stringify(st))}catch(e){}};
+(function(){let r=null;try{r=localStorage.getItem(K)}catch(e){}
+ try{if(r){st=JSON.parse(r)||{};return}}catch(e){}
+ st={};P.forEach(p=>{if(p.seed)st[p.slug]=p.seed});save()})();
+
+const $=id=>document.getElementById(id);
+const topics=Object.keys(RAW);
+$("ft").innerHTML='<option value="">All topics</option>'+topics.map(t=>`<option>${t.replace("&","&amp;")}</option>`).join("");
+const url=p=>`https://leetcode.com/problems/${p.slug}/`;
+let cur=null,last=null;
+
+function filtered(){
+ const q=$("q").value.trim().toLowerCase(),d=$("fd").value,s=$("fs").value,t=$("ft").value;
+ let a=P.filter(p=>(!q||p.title.toLowerCase().includes(q))&&(!d||p.d===d)&&(!t||p.t===t)&&
+  (!s||(s==="todo"?st[p.slug]!=="done":st[p.slug]===s)));
+ const o=$("so").value;
+ if(o==="ea")a.sort((x,y)=>ORD[x.d]-ORD[y.d]||x.i-y.i);
+ if(o==="he")a.sort((x,y)=>ORD[y.d]-ORD[x.d]||x.i-y.i);
+ if(o==="az")a.sort((x,y)=>x.title.localeCompare(y.title));
+ if(o==="td")a.sort((x,y)=>(st[x.slug]==="done")-(st[y.slug]==="done")||x.i-y.i);
+ return a;
+}
+function stats(){
+ const dn=P.filter(p=>st[p.slug]==="done"),rv=P.filter(p=>st[p.slug]==="review").length;
+ const by=k=>`${dn.filter(p=>p.d===k).length}/${P.filter(p=>p.d===k).length}`;
+ const pct=Math.round(dn.length/P.length*100);
+ $("bar").style.width=pct+"%";
+ $("stats").innerHTML=[[`${dn.length}/${P.length}`,`Solved (${pct}%)`],[P.length-dn.length,"Yet to do"],[by("E"),"Easy"],[by("M"),"Medium"],[by("H"),"Hard"],[rv,"Needs review"]]
+  .map(([b,l])=>`<div class="stat"><b>${b}</b><span>${l}</span></div>`).join("");
+}
+function render(){
+ const a=filtered();let h="",g="";
+ const grouped=!$("so").value;
+ a.forEach(p=>{
+  if(grouped&&p.t!==g){g=p.t;const n=P.filter(x=>x.t===g);h+=`<div class="grp">${g.replace("&","&amp;")} · ${n.filter(x=>st[x.slug]==="done").length}/${n.length}</div>`}
+  const s=st[p.slug]||"";
+  h+=`<div class="row ${s}" data-s="${p.slug}"><input type="checkbox" ${s==="done"?"checked":""} aria-label="Done"><a href="${url(p)}" target="_blank" rel="noopener">${p.title}</a>${p.prem?'<span class="chip">Premium</span>':""}${grouped?"":`<span class="chip t">${p.t.replace("&","&amp;")}</span>`}<span class="d ${p.d}">${DN[p.d]}</span><button class="rv" title="Mark for review">⚑</button></div>`;
+ });
+ $("list").innerHTML=h||'<div class="empty">No problems match these filters.</div>';
+ stats();
+}
+function showPick(){
+ const el=$("pick");
+ if(!cur){el.className="card";return}
+ const s=st[cur.slug]==="done";
+ el.className="card on";
+ el.innerHTML=`<div class="sub" style="margin:0">Your random pick</div><h2>${cur.title}</h2><span class="d ${cur.d}" style="text-align:left">${DN[cur.d]}</span> <span class="chip">${cur.t.replace("&","&amp;")}</span>
+ <div class="acts"><a class="btn pri" href="${url(cur)}" target="_blank" rel="noopener">Open on LeetCode ↗</a><button id="pd">${s?"Undo done":"Mark done ✓"}</button><button id="pa">🎲 Another</button><button id="px">Close</button></div>`;
+ $("pd").onclick=()=>{toggle(cur.slug);showPick()};
+ $("pa").onclick=shuffle;$("px").onclick=()=>{cur=null;showPick()};
+}
+function shuffle(){
+ const f=filtered();let pool=f.filter(p=>st[p.slug]!=="done");
+ if(!pool.length)pool=f;
+ if(!pool.length){cur=null;showPick();return}
+ let p;do{p=pool[Math.floor(Math.random()*pool.length)]}while(pool.length>1&&last&&p.slug===last);
+ cur=p;last=p.slug;showPick();
+ const r=document.querySelector(`[data-s="${p.slug}"]`);
+ if(r){r.classList.add("hl");setTimeout(()=>r.classList.remove("hl"),2500)}
+ $("pick").scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+function toggle(slug){if(st[slug]==="done")delete st[slug];else st[slug]="done";save();render()}
+$("list").addEventListener("change",e=>{const r=e.target.closest(".row");if(r)toggle(r.dataset.s)});
+$("list").addEventListener("click",e=>{
+ if(!e.target.classList.contains("rv"))return;
+ const s=e.target.closest(".row").dataset.s;
+ if(st[s]==="review")delete st[s];else st[s]="review";save();render();
+});
+["q","fd","fs","ft","so"].forEach(i=>$(i).addEventListener("input",render));
+$("shuf").onclick=shuffle;
+let rt=0;
+$("reset").onclick=function(){
+ if(!rt){this.textContent="Really reset?";rt=setTimeout(()=>{rt=0;this.textContent="Reset"},3000);return}
+ clearTimeout(rt);rt=0;this.textContent="Reset";st={};save();cur=null;showPick();render();
+};
+$("theme").onclick=()=>{
+ const r=document.documentElement,dark=(r.dataset.theme||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"))==="dark";
+ r.dataset.theme=dark?"light":"dark";try{localStorage.setItem("dsa-theme",r.dataset.theme)}catch(e){}
+};
+try{const t=localStorage.getItem("dsa-theme");if(t)document.documentElement.dataset.theme=t}catch(e){}
+render();
+</script>
+</body>
+</html>
